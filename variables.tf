@@ -24,7 +24,7 @@ locals {
     # resource definition
     kubernetes_service_account = {
       metadata = {
-        name = ""
+        name      = ""
         namespace = "kube-system"
       }
     }
@@ -44,7 +44,7 @@ locals {
     }
     kubernetes_namespace = {
       metadata = {
-        name = ""
+        name        = ""
         annotations = {}
         labels      = {}
       }
@@ -91,7 +91,7 @@ locals {
     kubernetes_cluster_role_binding => merge(
       local.kubernetes_cluster_role_binding_values[kubernetes_cluster_role_binding],
       {
-        for config in ["metadata","role_ref","subject"] :
+        for config in ["metadata", "role_ref", "subject"] :
         config => merge(local.default.kubernetes_cluster_role_binding[config], local.kubernetes_cluster_role_binding_values[kubernetes_cluster_role_binding][config])
       }
     )
@@ -111,7 +111,7 @@ locals {
     kubernetes_secret => merge(
       local.kubernetes_secret_values[kubernetes_secret],
       {
-        for config in ["metadata","data"] :
+        for config in ["metadata", "data"] :
         config => merge(local.default.kubernetes_secret[config], local.kubernetes_secret_values[kubernetes_secret][config])
       }
     )

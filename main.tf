@@ -37,7 +37,7 @@ resource "kubernetes_namespace" "namespace" {
   for_each = var.kubernetes_namespace
 
   metadata {
-    name = local.kubernetes_namespace[each.key].metadata.name == "" ? each.key : local.kubernetes_namespace[each.key].metadata.name
+    name        = local.kubernetes_namespace[each.key].metadata.name == "" ? each.key : local.kubernetes_namespace[each.key].metadata.name
     annotations = local.kubernetes_namespace[each.key].metadata.annotations
     labels      = local.kubernetes_namespace[each.key].metadata.labels
   }
