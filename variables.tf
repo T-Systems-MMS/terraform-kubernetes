@@ -18,15 +18,24 @@ variable "kubernetes_secret" {
   default     = {}
   description = "resource definition, default settings are defined within locals and merged with var settings"
 }
+variable "kubernetes_config_map" {
+  type        = any
+  default     = {}
+  description = "resource definition, default settings are defined within locals and merged with var settings"
+}
 
 locals {
   default = {
     # resource definition
     kubernetes_service_account = {
       metadata = {
-        name      = ""
-        namespace = "kube-system"
+        name          = ""
+        namespace     = "kube-system"
+        annotations   = null
+        generate_name = null
+        labels        = null
       }
+      automount_service_account_token = true
     }
     kubernetes_cluster_role_binding = {
       metadata = {
@@ -44,16 +53,35 @@ locals {
     }
     kubernetes_namespace = {
       metadata = {
-        name        = ""
-        annotations = {}
-        labels      = {}
+        name          = ""
+        annotations   = null
+        generate_name = null
+        labels        = null
       }
     }
     kubernetes_secret = {
       metadata = {
-        name = ""
+        name          = ""
+        namespace     = null
+        annotations   = null
+        generate_name = null
+        labels        = null
       }
-      data = {}
+      data        = null
+      binary_data = null
+      type        = null
+      immutable   = null
+    }
+    kubernetes_config_map = {
+      metadata = {
+        name          = ""
+        namespace     = null
+        annotations   = null
+        generate_name = null
+        labels        = null
+      }
+      data        = null
+      binary_data = null
     }
   }
 
@@ -73,6 +101,10 @@ locals {
   kubernetes_secret_values = {
     for kubernetes_secret in keys(var.kubernetes_secret) :
     kubernetes_secret => merge(local.default.kubernetes_secret, var.kubernetes_secret[kubernetes_secret])
+  }
+  kubernetes_config_map_values = {
+    for kubernetes_config_map in keys(var.kubernetes_config_map) :
+    kubernetes_config_map => merge(local.default.kubernetes_config_map, var.kubernetes_config_map[kubernetes_config_map])
   }
 
   # merge all custom and default values
@@ -111,8 +143,18 @@ locals {
     kubernetes_secret => merge(
       local.kubernetes_secret_values[kubernetes_secret],
       {
-        for config in ["metadata", "data"] :
+        for config in ["metadata"] :
         config => merge(local.default.kubernetes_secret[config], local.kubernetes_secret_values[kubernetes_secret][config])
+      }
+    )
+  }
+  kubernetes_config_map = {
+    for kubernetes_config_map in keys(var.kubernetes_config_map) :
+    kubernetes_config_map => merge(
+      local.kubernetes_config_map_values[kubernetes_config_map],
+      {
+        for config in ["metadata"] :
+        config => merge(local.default.kubernetes_config_map[config], local.kubernetes_config_map_values[kubernetes_config_map][config])
       }
     )
   }
