@@ -4,6 +4,7 @@ output "service" {
     for service in keys(kubernetes_service.service) :
     service => {
       metadata = kubernetes_service.service[service].metadata
+      status   = kubernetes_service.service[service].status
     }
   }
 }
